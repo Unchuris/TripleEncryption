@@ -4,7 +4,7 @@ import org.junit.Test
 
 class GammaTest {
 
-    private var gamma = Gamma.DEFAULT_GAMMA
+    private var gamma = key.sliceArray(0 until 34)
 
     @Test
     fun testCipher() {
@@ -26,7 +26,7 @@ class GammaTest {
             result.set(i, Gamma.encrypt(array, gamma))
             gamma = Gamma.getNextGamma(gamma)
         }
-        gamma = Gamma.DEFAULT_GAMMA
+        gamma = key.sliceArray(0 until 34)
         for (i in 0 until result.size step 16) {
             val array = result.sliceArray(i until i + 16)
             resultDecrypt.set(i, Gamma.decrypt(array, gamma))

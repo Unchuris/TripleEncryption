@@ -3,21 +3,11 @@ import kotlin.experimental.xor
 class Gamma {
 
     companion object {
-        val DEFAULT_GAMMA = byteArrayOf(15, 3, 2, 14, 13, 10, 9, 8, 5, 0, 7, 1, 4, 6, 12, 11)
 
-        private val defaultGammaMatrix: Matrix = arrayOf(
-                booleanArrayOf(true, false, false, false, false, false, false, false),
-                booleanArrayOf(false, false, false, false, true, false, false, false),
-                booleanArrayOf(false, false, false, false, false, true, false, false),
-                booleanArrayOf(false, true, false, false, false, false, false, false),
-                booleanArrayOf(false, false, false, false, false, false, true, false),
-                booleanArrayOf(false, false, true, false, false, false, false, false),
-                booleanArrayOf(false, false, false, false, false, false, false, true),
-                booleanArrayOf(false, false, false, true, false, false, false, true)
-        )
-        private val gammaTransposition = defaultGammaMatrix.toTransposition()
+        private val defaultGammaMatrix = key.sliceArray(0 until 34)
+        private val gammaTransposition = key.sliceArray(34 until 34 + 8)
 
-        fun encrypt(text: ByteArray, gamma: ByteArray = DEFAULT_GAMMA): ByteArray {
+        fun encrypt(text: ByteArray, gamma: ByteArray): ByteArray {
             val result = ByteArray(text.size)
             for (i in text.indices) {
                 result[i] = (text[i] xor gamma[i % gamma.size])

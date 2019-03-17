@@ -1,8 +1,8 @@
 class SubstitutionCipher {
     companion object {
 
-        private const val s0 = 9
-        private const val st = 7
+        private val s0 = key[key.size - 2]
+        private val st = key[key.size - 1]
         private const val MOD = 255
 
         fun encrypt(text: ByteArray): ByteArray {
