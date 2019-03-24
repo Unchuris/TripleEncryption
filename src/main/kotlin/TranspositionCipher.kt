@@ -1,28 +1,46 @@
-class TranspositionCipher {
-    companion object {
-        val DEFAULT_MATRIX: Matrix = arrayOf(
-                booleanArrayOf(false, false, false, false, false, true, false, false, false, false),
-                booleanArrayOf(false, false, false, false, false, false, false, false, false, true),
-                booleanArrayOf(false, false, false, false, false, false, false, true, false, false),
-                booleanArrayOf(true, false, false, false, false, false, false, false, false, false),
-                booleanArrayOf(false, false, false, false, true, false, false, false, false, false),
-                booleanArrayOf(false, false, true, false, false, false, false, false, false, false),
-                booleanArrayOf(false, false, false, false, false, false, false, false, true, false),
-                booleanArrayOf(false, false, false, true, false, false, false, false, false, false),
-                booleanArrayOf(false, true, false, false, false, false, false, false, false, false),
-                booleanArrayOf(false, false, false, false, false, false, true, false, false, false)
-        )
+import java.util.*
 
-        private val pt: Matrix = key.sliceArray(key.size - 2 - 10 until key.size - 2).toMatrix()
+class TranspositionCipher(private val p0: Matrix, private val pt: Matrix) {
 
-        fun encrypt(text: ByteArray, key: ByteArray): ByteArray {
-            return if (text.size != key.size) text else text.transposition(key)
+    private var index = 0
+
+    private val arrayKeys = initKeys()
+
+    fun encrypt(text: ByteArray) = action(text, true)
+
+    fun decrypt(text: ByteArray) = action(text, false)
+
+    private fun action(byteArray: ByteArray, encrypt: Boolean): ByteArray {
+        val result = ByteArray(byteArray.size)
+        val transposition = (if (encrypt) arrayKeys[index] else arrayKeys[arrayKeys.size - index - 1]).toTransposition()
+        val blockSize = transposition.size
+
+        for (i in 0 until byteArray.size step blockSize) {
+            val untilSize = i + if (i + blockSize <= byteArray.size) blockSize else byteArray.size - i
+
+            val array = if (encrypt) {
+                byteArray.transposition(transposition)
+            } else {
+                byteArray.transpositionReverse(transposition)
+            }
+
+            byteArray.sliceArray(i until untilSize).also {
+                result.set(i, if (it.size != blockSize) it else array)
+            }
         }
 
-        fun decrypt(text: ByteArray, key: ByteArray): ByteArray {
-            return if (text.size != key.size) text else text.transpositionReverse(key)
-        }
+        index++
 
-        fun getNextMatrix(currentMatrix: Matrix) = pt * currentMatrix
+        return result
+    }
+
+    private fun initKeys(): ArrayList<Matrix> {
+        val result = ArrayList<Matrix>()
+        var matrix = p0
+        (0 until ROUND).forEach {
+            matrix = pt * matrix
+            result.add(matrix)
+        }
+        return result
     }
 }

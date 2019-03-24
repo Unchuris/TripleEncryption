@@ -49,7 +49,7 @@ fun Matrix.toTransposition(): ByteArray {
 
 fun ByteArray.toMatrix(): Matrix {
     val result = getEmpty()
-    this.forEachIndexed { index, byte ->
+    this.removeReplays().forEachIndexed { index, byte ->
         result[index][byte.toInt()] = true
     }
     return result
@@ -58,16 +58,19 @@ fun ByteArray.toMatrix(): Matrix {
 fun ByteArray.transposition(transposition: ByteArray): ByteArray {
     require(size == transposition.size)
     val result = ByteArray(size)
-    transposition.forEachIndexed { index, item ->
+    transposition.removeReplays().forEachIndexed { index, item ->
         result[item.toInt()] = this[index]
     }
     return result
 }
 
+
+fun Byte.toUnsignedInt() = toInt() and 0xFF
+
 fun ByteArray.transpositionReverse(transposition: ByteArray): ByteArray {
     require(size == transposition.size)
     val result = ByteArray(size)
-    transposition.forEachIndexed { index, item ->
+    transposition.removeReplays().forEachIndexed { index, item ->
         result[index] = this[item.toInt()]
     }
     return result
@@ -76,24 +79,10 @@ fun ByteArray.transpositionReverse(transposition: ByteArray): ByteArray {
 fun BooleanArray.transposition(transposition: ByteArray): BooleanArray {
     require(size == transposition.size)
     val result = BooleanArray(size)
-    transposition.forEachIndexed { index, item ->
+    transposition.removeReplays().forEachIndexed { index, item ->
         result[item.toInt()] = this[index]
     }
     return result
-}
-
-fun ByteArray.toBooleanArray(): BooleanArray {
-    val binary = BooleanArray(size * 8)
-    var j = 0
-    for (byte in this) {
-        var value = byte.toInt()
-        for (i in 0..7) {
-            binary[j] = value and 128 != 0
-            value = value shl 1
-            j++
-        }
-    }
-    return binary
 }
 
 fun Byte.toBooleanArray(): BooleanArray {
@@ -125,4 +114,30 @@ fun ByteArray.set(startPosition: Int, byteArray: ByteArray) {
     byteArray.forEachIndexed { index, byte ->
         this[startPosition + index] = byte
     }
+}
+
+fun ByteArray.removeReplays(): ByteArray {
+    val array = this.transform()
+    check(array)
+    return array
+}
+
+private fun check(array: ByteArray) {
+    for (i in 0 until array.size) {
+        for (j in 0 until array.size) {
+            if (i != j && array[i] == array[j]) {
+                array[j] = (((array[j] + 1) % array.size).toByte())
+                check(array)
+                break
+            }
+        }
+    }
+}
+
+private fun ByteArray.transform(): ByteArray {
+    val result = ByteArray(size)
+    forEachIndexed { index, byte ->
+        result[index] = (byte.toUnsignedInt() % size).toByte()
+    }
+    return result
 }
