@@ -3,9 +3,9 @@ class KeyParser(byteArray: ByteArray) {
     private val key = byteArray
 
     companion object {
-        const val GAMMA_SIZE = 34
         const val GAMMA_SIZE_T = 8
-        const val BLOCK_SIZE = 10
+        const val BLOCK_SIZE = 15
+        const val GAMMA_SIZE = 64 - GAMMA_SIZE_T - BLOCK_SIZE - BLOCK_SIZE - 2
     }
 
     val transpositionCipher = TranspositionCipher(

@@ -18,14 +18,12 @@ class TranspositionCipher(private val p0: Matrix, private val pt: Matrix) {
         for (i in 0 until byteArray.size step blockSize) {
             val untilSize = i + if (i + blockSize <= byteArray.size) blockSize else byteArray.size - i
 
-            val array = if (encrypt) {
-                byteArray.transposition(transposition)
-            } else {
-                byteArray.transpositionReverse(transposition)
-            }
-
             byteArray.sliceArray(i until untilSize).also {
-                result.set(i, if (it.size != blockSize) it else array)
+                result.set(i, when {
+                    it.size != blockSize -> it
+                    encrypt -> it.transposition(transposition)
+                    else -> it.transpositionReverse(transposition)
+                })
             }
         }
 

@@ -3,19 +3,6 @@ import java.util.*
 typealias Vector = BooleanArray
 typealias Matrix = Array<Vector>
 
-fun getEmpty(): Matrix = arrayOf(
-        booleanArrayOf(false, false, false, false, false, false, false, false, false, false),
-        booleanArrayOf(false, false, false, false, false, false, false, false, false, false),
-        booleanArrayOf(false, false, false, false, false, false, false, false, false, false),
-        booleanArrayOf(false, false, false, false, false, false, false, false, false, false),
-        booleanArrayOf(false, false, false, false, false, false, false, false, false, false),
-        booleanArrayOf(false, false, false, false, false, false, false, false, false, false),
-        booleanArrayOf(false, false, false, false, false, false, false, false, false, false),
-        booleanArrayOf(false, false, false, false, false, false, false, false, false, false),
-        booleanArrayOf(false, false, false, false, false, false, false, false, false, false),
-        booleanArrayOf(false, false, false, false, false, false, false, false, false, false)
-)
-
 operator fun Matrix.times(other: Matrix): Matrix {
     val rows1 = this.size
     val cols1 = this[0].size
@@ -48,7 +35,7 @@ fun Matrix.toTransposition(): ByteArray {
 }
 
 fun ByteArray.toMatrix(): Matrix {
-    val result = getEmpty()
+    val result: Matrix = Array(size) { BooleanArray(size) }
     this.removeReplays().forEachIndexed { index, byte ->
         result[index][byte.toInt()] = true
     }
@@ -136,8 +123,10 @@ private fun check(array: ByteArray) {
 
 private fun ByteArray.transform(): ByteArray {
     val result = ByteArray(size)
+    val sum = this.sum()
     forEachIndexed { index, byte ->
-        result[index] = (byte.toUnsignedInt() % size).toByte()
+        val value = ((byte + sum) * (index + 1)).toByte()
+        result[index] = (value.toUnsignedInt() % size).toByte()
     }
     return result
 }

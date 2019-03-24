@@ -4,12 +4,16 @@ import java.io.FileNotFoundException
 import java.util.*
 import kotlin.experimental.xor
 
-const val ROUND = 5
+const val ROUND = 7
+
+private const val FILE_NAME = "C:\\Users\\vlady\\Desktop\\test33.txt"
+
+private const val KEY_FILE_NAME = "C:\\Users\\vlady\\Desktop\\key1.txt"
 
 fun main(args: Array<String>) {
     try {
         //generateKey()
-        initMenu()
+       initMenu()
     } catch (e: FileNotFoundException) {
         println("Не удалось прочитать файл, возможно путь указан неверно")
     }
@@ -40,8 +44,7 @@ private fun initMenu() {
             }
             val file = File(getFilePathName())
             val bytes = file.readBytes()
-            val rez = removeByte(decrypt(bytes, ROUND, KeyParser(key)))
-            file.writeBytes(rez)
+            file.writeBytes(removeByte(decrypt(bytes, ROUND, KeyParser(key))))
             println("Файл расшифрован!")
         }
     }
@@ -68,26 +71,15 @@ private fun addByte(byteArray: ByteArray): ByteArray {
 private fun removeByte(byteArray: ByteArray): ByteArray {
     if (byteArray.isEmpty()) return byteArray
     val spaceSize = byteArray[byteArray.size - 1] xor 111
-    return if (spaceSize > -1 && spaceSize < 11 && byteArray.size - spaceSize > -1) byteArray.copyOf(byteArray.size - spaceSize) else byteArray
+    return if (spaceSize > -1 && spaceSize < (BLOCK_SIZE + 1) && byteArray.size - spaceSize > -1) byteArray.copyOf(byteArray.size - spaceSize) else byteArray
 }
 
 private fun getKeyFilePathName(): String {
-//    println("Полный путь к файлу ключа: ")
-//    var string: String? = null
-//    do {
-//        string = readLine()
-//    } while (string == null)
-    return "C:\\Users\\vlady\\Desktop\\key1.txt"
+    return KEY_FILE_NAME
 }
 
 private fun getFilePathName(): String {
-//    println("Полный путь к файлу: ")
-//    var string:String? = null
-//    do {
-//        string = readLine()
-//    } while (string == null)
-    return "C:\\Users\\vlady\\Desktop\\test33.txt"
-    //return "C:\\Users\\vlady\\Desktop\\logoOmsu.jpg"
+    return FILE_NAME
 }
 
 private fun generateKey() {
